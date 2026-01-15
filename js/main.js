@@ -130,8 +130,6 @@ window.startGame = function () {
  */
 window.stopGame = function () {
   if (gameEngine && gameEngine.isGameActive) {
-    // 게임 중이었다면 점수 표시 후 종료
-    alert(`게임 종료! 현재 점수: ${gameEngine.score}점`);
     gameEngine.stop();
   }
 
