@@ -25,7 +25,7 @@ async function init() {
     // 1. PoseEngine 초기화
     poseEngine = new PoseEngine("./my_model/");
     const { maxPredictions, webcam } = await poseEngine.init({
-      size: 300, // 게임 화면을 위해 조금 더 키움
+      size: 500, // 게임 화면을 위해 조금 더 키움 (300 -> 500)
       flip: true
     });
 
@@ -38,13 +38,13 @@ async function init() {
     // 3. GameEngine 초기화
     gameEngine = new GameEngine();
     // 캔버스 크기 정보를 엔진에 전달
-    gameEngine.gameWidth = 300;
-    gameEngine.gameHeight = 300;
+    gameEngine.gameWidth = 500;
+    gameEngine.gameHeight = 500;
 
     // 4. 캔버스 설정
     const canvas = document.getElementById("canvas");
-    canvas.width = 300;
-    canvas.height = 300;
+    canvas.width = 500;
+    canvas.height = 500;
     ctx = canvas.getContext("2d");
 
     // 5. Label Container 설정
@@ -135,7 +135,7 @@ function handlePrediction(predictions, pose) {
 function drawPose(pose) {
   // A. 웹캠 그리기
   if (poseEngine.webcam && poseEngine.webcam.canvas) {
-    ctx.drawImage(poseEngine.webcam.canvas, 0, 0, 300, 300);
+    ctx.drawImage(poseEngine.webcam.canvas, 0, 0, 500, 500);
   }
 
   // B. 게임 엔진 업데이트 및 그리기 (AR 효과)

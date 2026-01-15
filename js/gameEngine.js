@@ -15,9 +15,9 @@ class GameEngine {
     this.fallingObjects = []; // 떨어지는 물체들 배
 
     // 게임 설정
-    this.gameWidth = 200;  // 캔버스 크기에 맞춤
-    this.gameHeight = 200;
-    this.basketY = 170;    // 바구니 Y 위치
+    this.gameWidth = 500;  // 캔버스 크기에 맞춤
+    this.gameHeight = 500;
+    this.basketY = 450;    // 바구니 Y 위치 (화면 하단)
     this.laneWidth = this.gameWidth / 3; // 3개 레인
 
     // 타이밍 관련
@@ -207,7 +207,7 @@ class GameEngine {
     // 1. 바구니 그리기
     const basketX = this.basketPosition * this.laneWidth + (this.laneWidth / 2);
 
-    ctx.font = "30px Arial";
+    ctx.font = "50px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("🧺", basketX, this.basketY);
@@ -218,7 +218,7 @@ class GameEngine {
 
     // 2. 떨어지는 물체 그리기
     for (const obj of this.fallingObjects) {
-      ctx.font = "30px Arial";
+      ctx.font = "50px Arial";
       ctx.fillText(obj.icon, obj.x, obj.y);
     }
 
