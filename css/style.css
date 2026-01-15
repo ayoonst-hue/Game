@@ -76,9 +76,10 @@ h1 {
 button {
   font-family: "Jua", sans-serif;
   /* 버튼도 주아체 적용 */
-  padding: 15px 20px;
-  font-size: 16px;
-  /* 폰트가 귀여우니 조금 더 키움 */
+  padding: 20px 30px;
+  /* 버튼 크기도 같이 키움 */
+  font-size: 24px;
+  /* 폰트 크기 대폭 확대 */
   cursor: pointer;
   border: 4px solid #fff;
   background-color: #000;
