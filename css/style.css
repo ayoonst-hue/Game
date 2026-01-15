@@ -2,10 +2,13 @@
 
 /* 구글 폰트(Press Start 2P)는 HTML에서 로드해야 함 */
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
 
 body {
-  font-family: "Press Start 2P", cursive;
-  background-color: #222; /* 어두운 배경 */
+  /* 영문/숫자는 픽셀 폰트, 한글은 모던한 고딕 폰트 사용 */
+  font-family: "Press Start 2P", "Noto Sans KR", sans-serif;
+  background-color: #222;
+  /* 어두운 배경 */
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -15,10 +18,11 @@ body {
   margin: 0;
   padding: 20px;
   gap: 20px;
-  background-image: 
+  background-image:
     linear-gradient(#333 1px, transparent 1px),
     linear-gradient(90deg, #333 1px, transparent 1px);
-  background-size: 20px 20px; /* 격자 무늬 배경 */
+  background-size: 20px 20px;
+  /* 격자 무늬 배경 */
 }
 
 .container {
@@ -32,14 +36,16 @@ body {
 
 h1 {
   font-size: 24px;
-  color: #ff00ff; /* 네온 핑크 */
+  color: #ff00ff;
+  /* 네온 핑크 */
   text-shadow: 4px 4px 0px #000;
   line-height: 1.5;
   margin: 0;
 }
 
 .description {
-  color: #00ff00; /* 네온 그린 */
+  color: #00ff00;
+  /* 네온 그린 */
   font-size: 10px;
   line-height: 1.6;
 }
@@ -78,7 +84,8 @@ button {
 
 button:hover {
   background-color: #333;
-  color: #ffff00; /* 호버 시 노란색 */
+  color: #ffff00;
+  /* 호버 시 노란색 */
   transform: translate(-2px, -2px);
   box-shadow: 6px 6px 0px #aaa;
 }
