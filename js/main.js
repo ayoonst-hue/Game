@@ -15,28 +15,35 @@ let labelContainer;
 /**
  * 애플리케이션 초기화
  */
-async function init() {
+// 페이지 로드 시 카메라 초기화
+window.onload = function () {
+  initCamera();
+};
+
+/**
+ * 카메라 및엔진 초기화 (페이지 로드 시 자동 실행)
+ */
+async function initCamera() {
   const startBtn = document.getElementById("startBtn");
   startBtn.disabled = true;
-  startBtn.innerText = "Loading..."; // 로딩 중 표시
+  startBtn.innerText = "Loading Camera...";
 
   try {
     // 1. PoseEngine 초기화
     poseEngine = new PoseEngine("./my_model/");
-    const { maxPredictions, webcam } = await poseEngine.init({
-      size: 500, // 게임 화면을 위해 조금 더 키움 (300 -> 500)
+    await poseEngine.init({
+      size: 500,
       flip: true
     });
 
-    // 2. Stabilizer 초기화 (떨림 방지)
+    // 2. Stabilizer 초기화
     stabilizer = new PredictionStabilizer({
-      threshold: 0.85,    // 확률 임계값 조정 (0.9 -> 0.85)
-      smoothingFrames: 7  // 7프레임 동안 유지해야 인정 (사용자 요청)
+      threshold: 0.85,
+      smoothingFrames: 7
     });
 
-    // 3. GameEngine 초기화
+    // 3. GameEngine 초기화 (아직 시작은 안함)
     gameEngine = new GameEngine();
-    // 캔버스 크기 정보를 엔진에 전달
     gameEngine.gameWidth = 500;
     gameEngine.gameHeight = 500;
 
@@ -46,57 +53,57 @@ async function init() {
     canvas.height = 500;
     ctx = canvas.getContext("2d");
 
-    // 5. Label Container 설정 (사용 안함, 필요시 주석 해제)
-    // labelContainer = document.getElementById("label-container");
-    // labelContainer.innerHTML = ""; ...
-
-    // 6. PoseEngine 콜백 설정
+    // 5. PoseEngine 콜백 설정
     poseEngine.setPredictionCallback(handlePrediction);
     poseEngine.setDrawCallback(drawPose);
 
-    // 7. 게임 이벤트 연결
+    // 6. 게임 이벤트 연결
     gameEngine.setScoreChangeCallback((score, level, lives) => {
-      // 필요시 UI 업데이트
       console.log(`Score: ${score}, Level: ${level}`);
     });
 
     gameEngine.setGameEndCallback((finalScore, finalLevel) => {
       alert(`게임 종료! 최종 점수: ${finalScore}점`);
-      stop();
+      stopGame();
     });
 
-    // 8. 화면 전환: 시작 화면 숨기기 -> 게임 화면 보이기
-    document.getElementById("start-screen").classList.add("hidden");
-    document.getElementById("game-screen").classList.remove("hidden");
-
-    // 9. 엔진 시작
+    // 7. 카메라 시작 (게임 엔진은 멈춘 상태)
     poseEngine.start();
-    gameEngine.start();
 
-    // 버튼 상태 복구
+    // 준비 완료
     startBtn.disabled = false;
     startBtn.innerText = "Game Start";
+
   } catch (error) {
     console.error("초기화 중 오류 발생:", error);
-    alert("초기화에 실패했습니다. 카메라 권한을 확인하세요.");
-    startBtn.disabled = false;
-    startBtn.innerText = "Game Start";
+    alert("카메라를 사용할 수 없습니다. 권한을 확인해주세요.");
+    startBtn.innerText = "Camera Error";
   }
 }
 
 /**
- * 애플리케이션 중지 및 메인 화면 복귀
+ * 게임 시작 (Start 버튼 클릭 시)
  */
-function stop() {
-  if (poseEngine) {
-    poseEngine.stop();
-  }
+function startGame() {
+  if (!gameEngine) return;
 
+  // 화면 전환
+  document.getElementById("start-screen").classList.add("hidden");
+  document.getElementById("game-screen").classList.remove("hidden");
+
+  // 게임 엔진 시작
+  gameEngine.start();
+}
+
+/**
+ * 게임 중지 및 메인 화면 복귀
+ */
+function stopGame() {
   if (gameEngine) {
     gameEngine.stop();
   }
 
-  // 화면 전환: 게임 화면 숨기기 -> 시작 화면 보이기
+  // 화면 전환
   document.getElementById("game-screen").classList.add("hidden");
   document.getElementById("start-screen").classList.remove("hidden");
 }
