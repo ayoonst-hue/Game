@@ -30,8 +30,12 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  max-width: 600px;
+  max-width: 1200px;
+  /* 너비를 넓혀서 한 줄에 나오도록 함 */
+  width: 100%;
   text-align: center;
+  white-space: nowrap;
+  /* 줄바꿈 방지 */
 }
 
 h1 {
