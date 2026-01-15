@@ -1,7 +1,12 @@
-/* 페이지 전체 스타일과 게임 UI 디자인 */
+/* Retro Game Style */
+
+/* 구글 폰트(Press Start 2P)는 HTML에서 로드해야 함 */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Press Start 2P", cursive;
+  background-color: #222; /* 어두운 배경 */
+  color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -9,46 +14,102 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 20px;
-  gap: 16px;
+  gap: 20px;
+  background-image: 
+    linear-gradient(#333 1px, transparent 1px),
+    linear-gradient(90deg, #333 1px, transparent 1px);
+  background-size: 20px 20px; /* 격자 무늬 배경 */
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  max-width: 600px;
+  text-align: center;
 }
 
 h1 {
-  margin: 0;
   font-size: 24px;
+  color: #ff00ff; /* 네온 핑크 */
+  text-shadow: 4px 4px 0px #000;
+  line-height: 1.5;
+  margin: 0;
 }
 
-.button-container {
+.description {
+  color: #00ff00; /* 네온 그린 */
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.canvas-wrapper {
+  position: relative;
+  border: 4px solid #fff;
+  box-shadow: 8px 8px 0px #000;
+  background: #000;
   display: flex;
-  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+#canvas {
+  display: block;
+}
+
+/* 컨트롤 버튼 */
+.controls {
+  display: flex;
+  gap: 20px;
 }
 
 button {
-  padding: 10px 20px;
-  font-size: 16px;
+  font-family: "Press Start 2P", cursive;
+  padding: 15px 20px;
+  font-size: 12px;
   cursor: pointer;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #fff;
+  border: 4px solid #fff;
+  background-color: #000;
+  color: #fff;
+  box-shadow: 4px 4px 0px #aaa;
+  transition: transform 0.1s;
 }
 
 button:hover {
-  background-color: #f0f0f0;
+  background-color: #333;
+  color: #ffff00; /* 호버 시 노란색 */
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #aaa;
+}
+
+button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px #000;
 }
 
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
-.canvas-container {
-  position: relative;
-  display: inline-block;
+#startBtn {
+  border-color: #00ff00;
+  color: #00ff00;
 }
 
-#canvas {
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  display: block;
+#stopBtn {
+  border-color: #ff0000;
+  color: #ff0000;
+}
+
+/* 예측 결과 (디버그) */
+#label-container {
+  font-size: 10px;
+  color: #aaa;
+  margin-top: 10px;
 }
 
 #max-prediction {
@@ -56,25 +117,10 @@ button:disabled {
   top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 16px;
-  font-weight: bold;
-  pointer-events: none;
-}
-
-#label-container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 200px;
-}
-
-#label-container div {
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 2px solid #fff;
+  color: #ffff00;
   padding: 8px;
-  background-color: #f5f5f5;
-  border-radius: 4px;
-  text-align: center;
+  font-size: 12px;
+  z-index: 10;
 }
