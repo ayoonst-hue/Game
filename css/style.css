@@ -65,6 +65,10 @@ h1 {
 
 #canvas {
   display: block;
+  width: 500px;
+  height: 500px;
+  background-color: #111;
+  /* 카메라 로딩 전 빈 화면 색상 */
 }
 
 /* 컨트롤 버튼 */
