@@ -10,25 +10,35 @@
 
 <body>
   <div class="container">
-    <h1>🍎 Fruit Catcher 🍊</h1>
-    <p class="description">
-      고개를 <b>왼쪽/오른쪽</b>으로 움직여 과일을 받으세요! (💣폭탄 조심)
-    </p>
-
-    <!-- 게임 캔버스 (웹캠 + 게임화면) -->
-    <div class="canvas-wrapper">
-      <canvas id="canvas" width="500" height="500"></canvas>
+    <!-- 시작 화면 -->
+    <div id="start-screen">
+      <h1>🍎 Fruit Catcher 🍊</h1>
+      <p class="description">
+        고개를 <b>왼쪽/오른쪽</b>으로 움직여 과일을 받으세요! (💣폭탄 조심)
+      </p>
+      <div class="controls">
+        <button id="startBtn" onclick="init()">Game Start</button>
+      </div>
     </div>
 
-    <!-- 예측 결과 표시 (디버그용) -->
-    <div id="label-container"></div>
-    <div id="max-prediction" class="highlight"></div>
+    <!-- 게임 화면 (처음에는 숨김) -->
+    <div id="game-screen" class="hidden">
+      <!-- 게임 캔버스 -->
+      <div class="canvas-wrapper">
+        <canvas id="canvas" width="500" height="500"></canvas>
+      </div>
 
-    <!-- 컨트롤 버튼 -->
-    <div class="controls">
-      <button id="startBtn" onclick="init()">Game Start</button>
-      <button id="stopBtn" onclick="stop()" disabled>Stop</button>
+      <!-- 예측 결과 디버그 (선택 사항) -->
+      <div id="max-prediction" class="highlight"></div>
+
+      <!-- 컨트롤 버튼 -->
+      <div class="controls" style="margin-top: 10px;">
+        <button id="stopBtn" onclick="stop()">Stop & Exit</button>
+      </div>
     </div>
+
+    <!-- 디버그용 라벨 컨테이너 (숨김 처리하거나 필요 시 표시) -->
+    <div id="label-container" style="display:none;"></div>
   </div>
 
   <!-- Teachable Machine & PoseNet 라이브러리 -->

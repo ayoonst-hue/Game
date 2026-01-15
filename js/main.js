@@ -17,9 +17,8 @@ let labelContainer;
  */
 async function init() {
   const startBtn = document.getElementById("startBtn");
-  const stopBtn = document.getElementById("stopBtn");
-
   startBtn.disabled = true;
+  startBtn.innerText = "Loading..."; // 로딩 중 표시
 
   try {
     // 1. PoseEngine 초기화
@@ -47,12 +46,9 @@ async function init() {
     canvas.height = 500;
     ctx = canvas.getContext("2d");
 
-    // 5. Label Container 설정
-    labelContainer = document.getElementById("label-container");
-    labelContainer.innerHTML = ""; // 초기화
-    for (let i = 0; i < maxPredictions; i++) {
-      labelContainer.appendChild(document.createElement("div"));
-    }
+    // 5. Label Container 설정 (사용 안함, 필요시 주석 해제)
+    // labelContainer = document.getElementById("label-container");
+    // labelContainer.innerHTML = ""; ...
 
     // 6. PoseEngine 콜백 설정
     poseEngine.setPredictionCallback(handlePrediction);
@@ -69,27 +65,29 @@ async function init() {
       stop();
     });
 
-    // 8. PoseEngine 시작
-    poseEngine.start();
+    // 8. 화면 전환: 시작 화면 숨기기 -> 게임 화면 보이기
+    document.getElementById("start-screen").classList.add("hidden");
+    document.getElementById("game-screen").classList.remove("hidden");
 
-    // 게임도 바로 시작 (또는 별도 버튼으로 분리 가능)
+    // 9. 엔진 시작
+    poseEngine.start();
     gameEngine.start();
 
-    stopBtn.disabled = false;
+    // 버튼 상태 복구
+    startBtn.disabled = false;
+    startBtn.innerText = "Game Start";
   } catch (error) {
     console.error("초기화 중 오류 발생:", error);
-    alert("초기화에 실패했습니다. 콘솔을 확인하세요.");
+    alert("초기화에 실패했습니다. 카메라 권한을 확인하세요.");
     startBtn.disabled = false;
+    startBtn.innerText = "Game Start";
   }
 }
 
 /**
- * 애플리케이션 중지
+ * 애플리케이션 중지 및 메인 화면 복귀
  */
 function stop() {
-  const startBtn = document.getElementById("startBtn");
-  const stopBtn = document.getElementById("stopBtn");
-
   if (poseEngine) {
     poseEngine.stop();
   }
@@ -98,8 +96,9 @@ function stop() {
     gameEngine.stop();
   }
 
-  startBtn.disabled = false;
-  stopBtn.disabled = true;
+  // 화면 전환: 게임 화면 숨기기 -> 시작 화면 보이기
+  document.getElementById("game-screen").classList.add("hidden");
+  document.getElementById("start-screen").classList.remove("hidden");
 }
 
 /**
