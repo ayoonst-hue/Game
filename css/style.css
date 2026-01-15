@@ -35,7 +35,7 @@ body {
 }
 
 h1 {
-  font-size: 24px;
+  font-size: 40px;
   color: #ff00ff;
   /* 네온 핑크 */
   text-shadow: 4px 4px 0px #000;
@@ -46,7 +46,7 @@ h1 {
 .description {
   color: #00ff00;
   /* 네온 그린 */
-  font-size: 10px;
+  font-size: 25px;
   line-height: 1.6;
 }
 
