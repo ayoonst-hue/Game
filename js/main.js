@@ -72,8 +72,13 @@ async function initCamera() {
     poseEngine.setDrawCallback(drawPose);
 
     // 7. 게임 이벤트 연결
-    gameEngine.setScoreChangeCallback((score, level, lives) => {
-      console.log(`Score: ${score}, Level: ${level}`);
+    gameEngine.setScoreChangeCallback((score, level, lives, combo) => {
+      // 사이드 패널 업데이트
+      const scoreDisplay = document.querySelector('.score-display');
+      const comboDisplay = document.querySelector('.combo-display');
+
+      if (scoreDisplay) scoreDisplay.innerText = score.toString().padStart(5, '0');
+      if (comboDisplay) comboDisplay.innerText = (combo || 0); // 콤보가 없으면 0
     });
 
     gameEngine.setGameEndCallback((finalScore, finalLevel) => {
@@ -100,6 +105,9 @@ async function initCamera() {
 /**
  * 게임 시작 (Start 버튼 클릭 시)
  */
+/**
+ * 게임 시작 (Start 버튼 클릭 시)
+ */
 window.startGame = function () {
   console.log("startGame called");
   if (!gameEngine) {
@@ -110,6 +118,7 @@ window.startGame = function () {
 
   try {
     // 화면 전환
+    document.body.classList.add("game-playing"); // 게임 모드 스타일 적용
     const startScreen = document.getElementById("start-screen");
     const gameScreen = document.getElementById("game-screen");
 
@@ -129,6 +138,8 @@ window.startGame = function () {
  * 게임 중지 및 메인 화면 복귀
  */
 window.stopGame = function () {
+  document.body.classList.remove("game-playing"); // 게임 모드 스타일 해제
+
   if (gameEngine && gameEngine.isGameActive) {
     gameEngine.stop();
   }

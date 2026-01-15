@@ -77,69 +77,248 @@ h1 {
   gap: 20px;
 }
 
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #87CEEB;
+  /* 하늘색 배경 (이미지 로드 전) */
+  background-image: url('../pixel_orchard_mascot_bg.png');
+  /* 픽셀 아트 배경 */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  font-family: 'Jua', sans-serif;
+}
+
+/* 전체 게임 레이아웃 (3단) */
+.game-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* 사이드 패널 공통 */
+.side-panel {
+  width: 250px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 4px solid #fff;
+  border-radius: 15px;
+  padding: 20px;
+  color: white;
+  text-align: center;
+  box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.5);
+}
+
+.panel-content h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #FFD700;
+  /* 골드 */
+  text-shadow: 2px 2px #000;
+}
+
+.score-display,
+.combo-display {
+  font-family: 'Courier New', monospace;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.mascot-speech {
+  background: #fff;
+  color: #000;
+  padding: 10px;
+  border-radius: 10px;
+  position: relative;
+  font-weight: bold;
+}
+
+.mascot-speech::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  border-width: 10px 10px 0;
+  border-style: solid;
+  border-color: #fff transparent;
+  transform: translateX(-50%);
+}
+
+.right-panel ul {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+  line-height: 2;
+}
+
+/* 중앙 패널 (레트로 게임기 본체 모양) */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  max-width: 600px;
+  /* 게임기 너비 */
+  width: 100%;
+  text-align: center;
+  position: relative;
+
+  /* 레트로 게임기 스타일링 (게임보이 감성) */
+  background-color: #c0c0c0;
+  /* 클래식 회색 플라스틱 */
+  border-radius: 10px 10px 40px 10px;
+  /* 비대칭 둥근 모서리 */
+  padding: 30px 20px 40px 20px;
+  box-shadow:
+    inset 4px 4px 5px rgba(255, 255, 255, 0.7),
+    /* 하이라이트 */
+    inset -4px -4px 5px rgba(0, 0, 0, 0.2),
+    /* 음영 */
+    10px 10px 20px rgba(0, 0, 0, 0.5);
+  /* 그림자 */
+  border: 4px solid #888;
+}
+
+/* 게임기 화면 베젤 (검정 테두리) */
+.container::before {
+  content: "DOT MATRIX WITH STEREO SOUND";
+  display: block;
+  width: 90%;
+  background-color: #555;
+  color: #888;
+  font-family: sans-serif;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 5px 0 10px 0;
+  border-radius: 10px 10px 0 0;
+  margin-bottom: -15px;
+  /* 캔버스와 겹치게 */
+  z-index: 0;
+  border: 2px solid #333;
+}
+
+/* 캔버스 래퍼 (실제 화면 영역) */
+.canvas-wrapper {
+  position: relative;
+  border: 6px solid #333;
+  /* 화면 베젤 */
+  border-radius: 5px;
+  box-shadow: inset 2px 2px 5px #000;
+  background: #0f380f;
+  /* 꺼진 화면 색상 (녹색빛 감성) */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+#canvas {
+  display: block;
+  width: 500px;
+  height: 500px;
+  background-color: #0f380f;
+  /* 빈 화면 */
+  opacity: 0.9;
+  /* 약간의 레트로한 흐릿함? */
+}
+
+/* 게임기 장식 라인 */
+.container::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 4px;
+  background: repeating-linear-gradient(90deg,
+      #999,
+      #999 10px,
+      #aaa 10px,
+      #aaa 20px);
+  margin-top: 20px;
+  border-radius: 2px;
+}
+
+/* 컨트롤 버튼 */
+.controls {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  /* 버튼 중앙 정렬 */
+  width: 100%;
+}
+
+/* 버튼 스타일 재정의 (게임기 버튼처럼) */
 button {
   font-family: "Jua", sans-serif;
-  /* 버튼도 주아체 적용 */
-  padding: 20px 30px;
-  /* 버튼 크기도 같이 키움 */
+  padding: 15px 30px;
   font-size: 24px;
-  /* 폰트 크기 대폭 확대 */
   cursor: pointer;
-  border: 4px solid #fff;
-  background-color: #000;
+  border: none;
+  border-radius: 50px;
+  /* 둥근 버튼 */
+  background: linear-gradient(135deg, #ff4d4d, #cc0000);
+  /* 빨간 버튼 */
   color: #fff;
-  box-shadow: 4px 4px 0px #aaa;
+  box-shadow:
+    3px 3px 0px #990000,
+    5px 5px 10px rgba(0, 0, 0, 0.3);
   transition: transform 0.1s;
+  text-shadow: 1px 1px 0 #990000;
 }
 
 button:hover {
-  background-color: #333;
-  color: #ffff00;
-  /* 호버 시 노란색 */
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px #aaa;
+  background: linear-gradient(135deg, #ff6666, #ff0000);
+  transform: translateY(2px);
+  box-shadow:
+    1px 1px 0px #990000,
+    3px 3px 5px rgba(0, 0, 0, 0.3);
 }
 
 button:active {
-  transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0px #000;
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
+  transform: translateY(4px);
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 #startBtn {
-  border-color: #00ff00;
-  color: #00ff00;
+  background: linear-gradient(135deg, #ff4d4d, #cc0000);
+  color: white;
+  /* 텍스트 흰색 */
 }
 
 #stopBtn {
-  border-color: #ff0000;
-  color: #ff0000;
+  background: linear-gradient(135deg, #444, #222);
+  /* 검정 버튼 */
+  color: #ddd;
 }
 
-/* 예측 결과 (디버그) */
-#label-container {
-  font-size: 10px;
-  color: #aaa;
-  margin-top: 10px;
+h1 {
+  font-size: 32px;
+  color: #333;
+  /* 게임기 표면의 글씨처럼 */
+  text-shadow: 1px 1px 0px #fff;
+  /* 음각 효과 */
+  line-height: 1.5;
+  margin: 0 0 25px 0;
+  /* 베젤과의 간격 확보 */
+  z-index: 2;
+  order: -1;
+  /* 베젤보다 위로 배치 */
 }
 
-#max-prediction {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.8);
-  border: 2px solid #fff;
-  color: #ffff00;
-  padding: 8px;
-  font-size: 12px;
-  z-index: 10;
+.description {
+  color: #333;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 /* 반응형 디자인 (모바일/태블릿) */
@@ -170,4 +349,23 @@ button:disabled {
 /* 유틸리티 클래스 */
 .hidden {
   display: none !important;
+}
+
+/* 게임 플레이 중 스타일 변경 (화면 구분) */
+body.game-playing {
+  background-color: #000;
+  /* 완전 검정 배경 */
+}
+
+/* 게임 중일 때 캔버스 테두리 변경 */
+body.game-playing .canvas-wrapper {
+  border-color: #00ff00;
+  /* 네온 그린 테두리 */
+  box-shadow: 0 0 20px #00ff00;
+  /* 빛나는 효과 */
+}
+
+/* 게임 중일 때 제목 숨김 (게임 집중) */
+body.game-playing h1 {
+  display: none;
 }

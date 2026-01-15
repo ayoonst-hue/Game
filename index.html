@@ -9,40 +9,71 @@
 </head>
 
 <body>
-  <div class="container">
-    <h1>🍎 Fruit Catcher 🍊</h1>
+  <div class="game-wrapper">
+    <!-- 왼쪽 패널: 스코어 보드 (아케이드 스타일) -->
+    <div class="side-panel left-panel">
+      <div class="panel-content">
+        <h2>👑<br>High<br>Score</h2>
+        <div class="score-display">00000</div>
 
-    <!-- 캔버스 (항상 표시) -->
-    <div class="canvas-wrapper">
-      <canvas id="canvas" width="500" height="500"></canvas>
-    </div>
+        <h2>🔥<br>Combo</h2>
+        <div class="combo-display">0</div>
 
-    <!-- 시작 화면 -->
-    <div id="start-screen">
-      <p class="description">
-        고개를 <b>왼쪽/오른쪽</b>으로 움직여 과일을 받으세요! (💣폭탄 조심)
-      </p>
-      <div class="controls">
-        <button id="startBtn" onclick="startGame()">Game Start</button>
+        <div class="mascot-speech">
+          "멍멍! 사과를 받아라!"
+        </div>
       </div>
     </div>
 
-    <!-- 게임 화면 (처음에는 숨김) -->
-    <div id="game-screen" class="hidden">
-      <!-- 게임 캔버스 -->
+    <!-- 중앙: 메인 게임 -->
+    <div class="container main-panel">
+      <h1>🍎 Fruit Catcher 🍊</h1>
 
-
-      <!-- 예측 결과 디버그 (선택 사항) -->
-      <div id="max-prediction" class="highlight"></div>
-
-      <!-- 컨트롤 버튼 -->
-      <div class="controls" style="margin-top: 10px;">
-        <button id="stopBtn" onclick="stopGame()">Stop & Exit</button>
+      <!-- 캔버스 (항상 표시) -->
+      <div class="canvas-wrapper">
+        <canvas id="canvas" width="500" height="500"></canvas>
       </div>
+
+      <!-- 시작 화면 -->
+      <div id="start-screen">
+        <p class="description">
+          고개를 <b>왼쪽/오른쪽</b>으로 움직여 과일을 받으세요! (💣폭탄 조심)
+        </p>
+        <div class="controls">
+          <button id="startBtn" onclick="startGame()">Game Start</button>
+        </div>
+      </div>
+
+      <!-- 게임 화면 (처음에는 숨김) -->
+      <div id="game-screen" class="hidden">
+        <!-- 예측 결과 디버그 (선택 사항) -->
+        <div id="max-prediction" class="highlight"></div>
+
+        <!-- 컨트롤 버튼 -->
+        <div class="controls" style="margin-top: 10px;">
+          <button id="stopBtn" onclick="stopGame()">Stop & Exit</button>
+        </div>
+      </div>
+
+      <!-- 디버그용 라벨 컨테이너 (숨김 처리하거나 필요 시 표시) -->
+      <div id="label-container" style="display:none;"></div>
     </div>
 
-    <!-- 디버그용 라벨 컨테이너 (숨김 처리하거나 필요 시 표시) -->
-    <div id="label-container" style="display:none;"></div>
+    <!-- 오른쪽 패널: 게임 방법 -->
+    <div class="side-panel right-panel">
+      <div class="panel-content">
+        <h2>💡<br>How<br>to<br>Play</h2>
+        <ul>
+          <li>📸 <b>Camera</b> ON</li>
+          <li>⬅️ <b>Left</b> Head</li>
+          <li>➡️ <b>Right</b> Head</li>
+          <li>💣 <b>Bomb</b> Avoid</li>
+        </ul>
+        <div class="key-guide">
+          <p>Press <b>START</b> to Play!</p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Teachable Machine & PoseNet 라이브러리 -->
