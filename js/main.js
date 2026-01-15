@@ -25,23 +25,26 @@ async function init() {
     // 1. PoseEngine 초기화
     poseEngine = new PoseEngine("./my_model/");
     const { maxPredictions, webcam } = await poseEngine.init({
-      size: 200,
+      size: 300, // 게임 화면을 위해 조금 더 키움
       flip: true
     });
 
-    // 2. Stabilizer 초기화
+    // 2. Stabilizer 초기화 (떨림 방지)
     stabilizer = new PredictionStabilizer({
-      threshold: 0.7,
-      smoothingFrames: 3
+      threshold: 0.85,    // 확률 임계값 조정 (0.9 -> 0.85)
+      smoothingFrames: 7  // 7프레임 동안 유지해야 인정 (사용자 요청)
     });
 
-    // 3. GameEngine 초기화 (선택적)
+    // 3. GameEngine 초기화
     gameEngine = new GameEngine();
+    // 캔버스 크기 정보를 엔진에 전달
+    gameEngine.gameWidth = 300;
+    gameEngine.gameHeight = 300;
 
     // 4. 캔버스 설정
     const canvas = document.getElementById("canvas");
-    canvas.width = 200;
-    canvas.height = 200;
+    canvas.width = 300;
+    canvas.height = 300;
     ctx = canvas.getContext("2d");
 
     // 5. Label Container 설정
@@ -55,8 +58,22 @@ async function init() {
     poseEngine.setPredictionCallback(handlePrediction);
     poseEngine.setDrawCallback(drawPose);
 
-    // 7. PoseEngine 시작
+    // 7. 게임 이벤트 연결
+    gameEngine.setScoreChangeCallback((score, level, lives) => {
+      // 필요시 UI 업데이트
+      console.log(`Score: ${score}, Level: ${level}`);
+    });
+
+    gameEngine.setGameEndCallback((finalScore, finalLevel) => {
+      alert(`게임 종료! 최종 점수: ${finalScore}점`);
+      stop();
+    });
+
+    // 8. PoseEngine 시작
     poseEngine.start();
+
+    // 게임도 바로 시작 (또는 별도 버튼으로 분리 가능)
+    gameEngine.start();
 
     stopBtn.disabled = false;
   } catch (error) {
@@ -77,12 +94,8 @@ function stop() {
     poseEngine.stop();
   }
 
-  if (gameEngine && gameEngine.isGameActive) {
+  if (gameEngine) {
     gameEngine.stop();
-  }
-
-  if (stabilizer) {
-    stabilizer.reset();
   }
 
   startBtn.disabled = false;
@@ -98,7 +111,7 @@ function handlePrediction(predictions, pose) {
   // 1. Stabilizer로 예측 안정화
   const stabilized = stabilizer.stabilize(predictions);
 
-  // 2. Label Container 업데이트
+  // 2. Label Container 업데이트 (디버그용)
   for (let i = 0; i < predictions.length; i++) {
     const classPrediction =
       predictions[i].className + ": " + predictions[i].probability.toFixed(2);
@@ -109,50 +122,33 @@ function handlePrediction(predictions, pose) {
   const maxPredictionDiv = document.getElementById("max-prediction");
   maxPredictionDiv.innerHTML = stabilized.className || "감지 중...";
 
-  // 4. GameEngine에 포즈 전달 (게임 모드일 경우)
-  if (gameEngine && gameEngine.isGameActive && stabilized.className) {
-    gameEngine.onPoseDetected(stabilized.className);
+  // 4. GameEngine에 포즈 전달
+  if (gameEngine && stabilized.className) {
+    gameEngine.setBasketPosition(stabilized.className);
   }
 }
 
 /**
- * 포즈 그리기 콜백
+ * 포즈 그리기 및 게임 렌더링 루프
  * @param {Object} pose - PoseNet 포즈 데이터
  */
 function drawPose(pose) {
+  // A. 웹캠 그리기
   if (poseEngine.webcam && poseEngine.webcam.canvas) {
-    ctx.drawImage(poseEngine.webcam.canvas, 0, 0);
-
-    // 키포인트와 스켈레톤 그리기
-    if (pose) {
-      const minPartConfidence = 0.5;
-      tmPose.drawKeypoints(pose.keypoints, minPartConfidence, ctx);
-      tmPose.drawSkeleton(pose.keypoints, minPartConfidence, ctx);
-    }
-  }
-}
-
-// 게임 모드 시작 함수 (선택적 - 향후 확장용)
-function startGameMode(config) {
-  if (!gameEngine) {
-    console.warn("GameEngine이 초기화되지 않았습니다.");
-    return;
+    ctx.drawImage(poseEngine.webcam.canvas, 0, 0, 300, 300);
   }
 
-  gameEngine.setCommandChangeCallback((command) => {
-    console.log("새로운 명령:", command);
-    // UI 업데이트 로직 추가 가능
-  });
+  // B. 게임 엔진 업데이트 및 그리기 (AR 효과)
+  if (gameEngine) {
+    gameEngine.update(performance.now());
+    gameEngine.draw(ctx);
+  }
 
-  gameEngine.setScoreChangeCallback((score, level) => {
-    console.log(`점수: ${score}, 레벨: ${level}`);
-    // UI 업데이트 로직 추가 가능
-  });
-
-  gameEngine.setGameEndCallback((finalScore, finalLevel) => {
-    console.log(`게임 종료! 최종 점수: ${finalScore}, 최종 레벨: ${finalLevel}`);
-    alert(`게임 종료!\n최종 점수: ${finalScore}\n최종 레벨: ${finalLevel}`);
-  });
-
-  gameEngine.start(config);
+  // C. 스켈레톤 그리기 (선택사항, 게임에 방해되면 주석 처리)
+  //   if (pose) {
+  //     const minPartConfidence = 0.5;
+  //     tmPose.drawKeypoints(pose.keypoints, minPartConfidence, ctx);
+  //     tmPose.drawSkeleton(pose.keypoints, minPartConfidence, ctx);
+  //   }
 }
+

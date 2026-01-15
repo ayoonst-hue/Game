@@ -1,43 +1,52 @@
 /**
  * gameEngine.js
- * 게임 단계, 명령, 점수, 제한시간 등 게임 규칙 전체를 담당
- *
- * 포즈 인식을 활용한 게임 로직을 관리하는 엔진
- * (현재는 기본 템플릿이므로 향후 게임 로직 추가 가능)
+ * 과일 받기 게임(Falling Fruits)의 핵심 로직을 담당
  */
 
 class GameEngine {
   constructor() {
     this.score = 0;
     this.level = 1;
-    this.timeLimit = 0;
-    this.currentCommand = null;
+    this.lives = 3;
     this.isGameActive = false;
-    this.gameTimer = null;
-    this.onCommandChange = null; // 명령 변경 콜백
-    this.onScoreChange = null; // 점수 변경 콜백
-    this.onGameEnd = null; // 게임 종료 콜백
+
+    // 게임 오브젝트 상태
+    this.basketPosition = 1; // 0: Left, 1: Center, 2: Right
+    this.fallingObjects = []; // 떨어지는 물체들 배
+
+    // 게임 설정
+    this.gameWidth = 200;  // 캔버스 크기에 맞춤
+    this.gameHeight = 200;
+    this.basketY = 170;    // 바구니 Y 위치
+    this.laneWidth = this.gameWidth / 3; // 3개 레인
+
+    // 타이밍 관련
+    this.lastSpawnTime = 0;
+    this.spawnInterval = 1500; // 1.5초마다 생성 (레벨업시 감소)
+    this.lastTime = 0;
+
+    // 콜백
+    this.onScoreChange = null;
+    this.onGameEnd = null;
   }
 
   /**
    * 게임 시작
-   * @param {Object} config - 게임 설정 { timeLimit, commands }
    */
-  start(config = {}) {
+  start() {
     this.isGameActive = true;
     this.score = 0;
     this.level = 1;
-    this.timeLimit = config.timeLimit || 60; // 기본 60초
-    this.commands = config.commands || []; // 게임 명령어 배열
+    this.lives = 3;
+    this.fallingObjects = [];
+    this.lastSpawnTime = 0;
+    this.spawnInterval = 1500;
+    this.lastTime = performance.now();
 
-    if (this.timeLimit > 0) {
-      this.startTimer();
-    }
+    // 초기 바구니 위치 (중앙)
+    this.basketPosition = 1;
 
-    // 첫 번째 명령 발급 (게임 모드일 경우)
-    if (this.commands.length > 0) {
-      this.issueNewCommand();
-    }
+    console.log("Game Started! Catch the fruits!");
   }
 
   /**
@@ -45,116 +54,194 @@ class GameEngine {
    */
   stop() {
     this.isGameActive = false;
-    this.clearTimer();
-
     if (this.onGameEnd) {
       this.onGameEnd(this.score, this.level);
     }
   }
 
   /**
-   * 타이머 시작
+   * 바구니 위치 설정 (AI 모델 결과 연결)
+   * @param {string} poseLabel - "LEFT", "CENTER", "RIGHT"
    */
-  startTimer() {
-    this.gameTimer = setInterval(() => {
-      this.timeLimit--;
-
-      if (this.timeLimit <= 0) {
-        this.stop();
-      }
-    }, 1000);
+  setBasketPosition(poseLabel) {
+    if (poseLabel === "LEFT") this.basketPosition = 0;
+    else if (poseLabel === "CENTER") this.basketPosition = 1;
+    else if (poseLabel === "RIGHT") this.basketPosition = 2;
   }
 
   /**
-   * 타이머 정리
+   * 게임 상태 업데이트 (프레임마다 호출)
+   * @param {number} currentTime - 현재 시간 (ms)
    */
-  clearTimer() {
-    if (this.gameTimer) {
-      clearInterval(this.gameTimer);
-      this.gameTimer = null;
-    }
-  }
-
-  /**
-   * 새로운 명령 발급
-   */
-  issueNewCommand() {
-    if (this.commands.length === 0) return;
-
-    const randomIndex = Math.floor(Math.random() * this.commands.length);
-    this.currentCommand = this.commands[randomIndex];
-
-    if (this.onCommandChange) {
-      this.onCommandChange(this.currentCommand);
-    }
-  }
-
-  /**
-   * 포즈 인식 결과 처리
-   * @param {string} detectedPose - 인식된 포즈 이름
-   */
-  onPoseDetected(detectedPose) {
+  update(currentTime) {
     if (!this.isGameActive) return;
 
-    // 현재 명령과 일치하는지 확인
-    if (this.currentCommand && detectedPose === this.currentCommand) {
-      this.addScore(10); // 점수 추가
-      this.issueNewCommand(); // 새로운 명령 발급
+    // 델타 타임 계산 (초 단위)
+    const deltaTime = (currentTime - this.lastTime) / 1000;
+    this.lastTime = currentTime;
+
+    // 1. 새로운 물체 생성
+    if (currentTime - this.lastSpawnTime > this.spawnInterval) {
+      this.spawnObject();
+      this.lastSpawnTime = currentTime;
+    }
+
+    // 2. 물체 이동 및 상태 업데이트
+    for (let i = this.fallingObjects.length - 1; i >= 0; i--) {
+      const obj = this.fallingObjects[i];
+
+      // 속도만큼 아래로 이동
+      obj.y += obj.speed * deltaTime;
+
+      // A. 충돌 감지 (바구니와 닿았는지)
+      // 바구니의 중앙 Y 위치 즈음 + 같은 레인에 있는지 확인
+      if (
+        obj.y >= this.basketY - 20 &&
+        obj.y <= this.basketY + 20 &&
+        obj.lane === this.basketPosition
+      ) {
+        this.handleCollision(obj);
+        this.fallingObjects.splice(i, 1); // 제거
+        continue;
+      }
+
+      // B. 바닥에 닿았을 때 (놓침)
+      if (obj.y > this.gameHeight) {
+        this.handleMiss(obj);
+        this.fallingObjects.splice(i, 1); // 제거
+      }
     }
   }
 
   /**
-   * 점수 추가
-   * @param {number} points - 추가할 점수
+   * 물체 생성
    */
-  addScore(points) {
-    this.score += points;
+  spawnObject() {
+    // 0, 1, 2 중 랜덤 레인
+    const lane = Math.floor(Math.random() * 3);
 
-    // 레벨업 로직 (예: 100점마다)
-    if (this.score >= this.level * 100) {
-      this.level++;
+    // 아이템 타입 결정 (80% 과일, 20% 폭탄)
+    const type = Math.random() > 0.2 ? 'fruit' : 'bomb';
+
+    // 과일 종류 랜덤
+    let item = '🍎';
+    let score = 100;
+
+    if (type === 'fruit') {
+      const rand = Math.random();
+      if (rand > 0.7) { item = '🍊'; score = 200; } // 오렌지
+      else if (rand > 0.9) { item = '🍇'; score = 300; } // 포도
+    } else {
+      item = '💣';
+      score = -500;
     }
 
-    if (this.onScoreChange) {
-      this.onScoreChange(this.score, this.level);
+    this.fallingObjects.push({
+      lane: lane,
+      x: lane * this.laneWidth + (this.laneWidth / 2), // 레인 중앙
+      y: -30, // 화면 위에서 시작
+      type: type,
+      icon: item,
+      scoreValue: score,
+      speed: 100 + (this.level * 20) // 레벨 비례 속도 증가
+    });
+  }
+
+  /**
+   * 충돌 처리 (획득)
+   */
+  handleCollision(obj) {
+    if (obj.type === 'bomb') {
+      // 폭탄: 점수 깎이거나 게임 오버
+      // this.lives--; // 라이프 감소 규칙을 원하면 주석 해제
+      this.score = Math.max(0, this.score + obj.scoreValue); // 0점 미만 방지
+      console.log("BOMB! Life lost!");
+    } else {
+      // 과일: 점수 획득
+      this.score += obj.scoreValue;
+    }
+
+    this.checkLevelUp();
+    this.notifyScoreChange();
+
+    if (this.lives <= 0) {
+      this.stop();
     }
   }
 
   /**
-   * 명령 변경 콜백 등록
-   * @param {Function} callback - (command) => void
+   * 놓침 처리
    */
-  setCommandChangeCallback(callback) {
-    this.onCommandChange = callback;
+  handleMiss(obj) {
+    if (obj.type === 'fruit') {
+      // 과일 놓치면 라이프 감소? (여기서는 그냥 점수만 유지할지 선택)
+      // this.lives--; 
+      console.log("Missed fruit...");
+    }
+    // 폭탄을 피해서 바닥에 닿은건 잘한 일! 점수 변동 없음.
+
+    this.notifyScoreChange();
+    if (this.lives <= 0) {
+      this.stop();
+    }
+  }
+
+  checkLevelUp() {
+    // 1000점마다 레벨업
+    const newLevel = Math.floor(this.score / 1000) + 1;
+    if (newLevel > this.level) {
+      this.level = newLevel;
+      // 난이도 조절: 생성 주기 단축
+      this.spawnInterval = Math.max(500, 1500 - (this.level * 100));
+      console.log(`Level Up! Current Level: ${this.level}`);
+    }
   }
 
   /**
-   * 점수 변경 콜백 등록
-   * @param {Function} callback - (score, level) => void
+   * 게임 화면 그리기
+   * @param {CanvasRenderingContext2D} ctx 
    */
+  draw(ctx) {
+    if (!this.isGameActive) return;
+
+    // 1. 바구니 그리기
+    const basketX = this.basketPosition * this.laneWidth + (this.laneWidth / 2);
+
+    ctx.font = "30px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("🧺", basketX, this.basketY);
+
+    // 디버그: 바구니 위치 영역 표시 (선택사항)
+    // ctx.fillStyle = "rgba(0, 255, 0, 0.2)";
+    // ctx.fillRect(this.basketPosition * this.laneWidth, this.basketY - 20, this.laneWidth, 40);
+
+    // 2. 떨어지는 물체 그리기
+    for (const obj of this.fallingObjects) {
+      ctx.font = "30px Arial";
+      ctx.fillText(obj.icon, obj.x, obj.y);
+    }
+
+    // 3. UI 그리기 (점수, 레벨)
+    ctx.fillStyle = "white";
+    ctx.font = "14px Arial";
+    ctx.textAlign = "left";
+    ctx.fillText(`Score: ${this.score}`, 10, 20);
+    ctx.fillText(`Level: ${this.level}`, 10, 40);
+  }
+
   setScoreChangeCallback(callback) {
     this.onScoreChange = callback;
   }
 
-  /**
-   * 게임 종료 콜백 등록
-   * @param {Function} callback - (finalScore, finalLevel) => void
-   */
   setGameEndCallback(callback) {
     this.onGameEnd = callback;
   }
 
-  /**
-   * 현재 게임 상태 반환
-   */
-  getGameState() {
-    return {
-      isActive: this.isGameActive,
-      score: this.score,
-      level: this.level,
-      timeRemaining: this.timeLimit,
-      currentCommand: this.currentCommand
-    };
+  notifyScoreChange() {
+    if (this.onScoreChange) {
+      this.onScoreChange(this.score, this.level, this.lives);
+    }
   }
 }
 
