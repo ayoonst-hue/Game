@@ -2,11 +2,11 @@
 
 /* 구글 폰트(Press Start 2P)는 HTML에서 로드해야 함 */
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
 
 body {
-  /* 영문/숫자는 픽셀 폰트, 한글은 모던한 고딕 폰트 사용 */
-  font-family: "Press Start 2P", "Noto Sans KR", sans-serif;
+  /* 영문/숫자는 픽셀 폰트, 한글은 귀여운 주아체 사용 */
+  font-family: "Press Start 2P", "Jua", sans-serif;
   background-color: #222;
   /* 어두운 배경 */
   color: #fff;
