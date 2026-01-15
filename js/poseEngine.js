@@ -37,6 +37,11 @@ class PoseEngine {
     await this.webcam.setup();
     await this.webcam.play();
 
+    // 캔버스 중복 방지: 원본 웹캠 캔버스는 숨김 처리
+    if (this.webcam.canvas) {
+      this.webcam.canvas.style.display = 'none';
+    }
+
     return {
       maxPredictions: this.maxPredictions,
       webcam: this.webcam

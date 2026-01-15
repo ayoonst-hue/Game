@@ -53,7 +53,9 @@ class GameEngine {
    * 게임 중지
    */
   stop() {
+    if (!this.isGameActive) return;
     this.isGameActive = false;
+
     if (this.onGameEnd) {
       this.onGameEnd(this.score, this.level);
     }
