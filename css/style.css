@@ -37,21 +37,6 @@ body {
   /* 줄바꿈 방지 */
 }
 
-h1 {
-  font-size: 40px;
-  color: #ff00ff;
-  /* 네온 핑크 */
-  text-shadow: 4px 4px 0px #000;
-  line-height: 1.5;
-  margin: 0;
-}
-
-.description {
-  color: #00ff00;
-  /* 네온 그린 */
-  font-size: 25px;
-  line-height: 1.6;
-}
 
 .canvas-wrapper {
   position: relative;
@@ -317,8 +302,10 @@ h1 {
 
 .description {
   color: #333;
-  font-size: 35px;
+  font-size: 22px;
   font-weight: bold;
+  white-space: normal;
+  word-break: keep-all;
 }
 
 /* 반응형 디자인 (모바일/태블릿) */
